@@ -12,37 +12,45 @@ function Viewport(props) {
   const currentScrollTop = useWindowPosition("#viewport");
 
   const { rowHeight, totalContentHeight, paddingTop, rows } = useMemo(() => {
-    const _rowHeight = 25;
+    const result = {
+      rowHeight: 25,
+      totalContentHeight: height,
+      paddingTop: 0,
+      rows: [],
+    };
+
+    if (data.length === 0) return result;
 
     const totalRows = data.length;
 
-    const _visibleRows = Math.ceil(height / _rowHeight) + nodePadding;
+    const visibleRows = Math.ceil(height / result.rowHeight) + nodePadding;
 
-    const _totalContentHeight = totalRows * _rowHeight;
+    result.totalContentHeight = totalRows * result.rowHeight;
 
-    let _startRow = currentScrollTop / _rowHeight - nodePadding;
-    _startRow = Math.max(0, _startRow);
-    _startRow = Math.min(_startRow, totalRows - _visibleRows);
+    let startRow = currentScrollTop / result.rowHeight;
+    startRow = Math.min(startRow, totalRows - visibleRows);
 
-    const _paddingTop = _startRow * _rowHeight;
+    result.paddingTop = startRow * result.rowHeight;
 
-    const _rows = data.slice(_startRow, _startRow + _visibleRows);
+    const endRow = startRow + visibleRows;
 
-    return {
-      rowHeight: _rowHeight,
-      totalContentHeight: _totalContentHeight,
-      paddingTop: _paddingTop,
-      rows: _rows,
-    };
+    result.rows = data.slice(startRow, endRow);
+
+    return result;
   }, [height, data, nodePadding, currentScrollTop]);
 
   return (
     <div id="viewport" style={{ height, overflow: "auto" }}>
       <div style={{ height: totalContentHeight }}>
-        <table className="Table" style={{ paddingTop: paddingTop }}>
+        <table
+          className="Table"
+          cellPadding="0"
+          cellSpacing="0"
+          style={{ paddingTop }}
+        >
           <tbody>
             {rows.map((row) => (
-              <Row key={row.no} data={row} height={rowHeight} />
+              <Row key={row.no} style={{ height: rowHeight }} {...row} />
             ))}
           </tbody>
         </table>

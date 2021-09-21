@@ -13,7 +13,9 @@ function App() {
     setUsers(data);
   }, []);
 
-  return <Viewport height={window.innerHeight} data={users} nodePadding={2} />;
+  if (users.length === 0) return <div>Loading...</div>;
+
+  return <Viewport height={window.innerHeight} data={users} nodePadding={4} />;
 }
 
 export default App;
